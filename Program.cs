@@ -1,4 +1,5 @@
-﻿using GitHubApiCall.Helpers;
+﻿using System.Data;
+using GitHubApiCall.Helpers;
 using Newtonsoft.Json;
 
 namespace GitHubApiCall
@@ -9,11 +10,20 @@ namespace GitHubApiCall
         {
             WelcomeMessage();
 
-            RunAsync().Wait();
+            //RunAsync().Wait();
 
             while (true)
             {
+                Helper.PrintCommandMessage("Enter command : ");
 
+                var input = Console.ReadLine() ?? string.Empty;
+
+                if (string.IsNullOrEmpty(input))
+                {
+                    Helper.PrintInfoMessage("No input detected, try again !");
+                }
+
+                var exit = false;
             }
         }
 
@@ -71,7 +81,7 @@ namespace GitHubApiCall
         static void WelcomeMessage()
         {
             Helper.PrintInfoMessage("Hello, Welcome to GitHub User Activity!");
-            Helper.PrintInfoMessage("Type \"help\" to know the set of API calls.");
+            Helper.PrintInfoMessage("Type \"help\" to know the set of API commands.");
         }
     }
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GitHubApiCall.Helpers
+﻿namespace GitHubApiCall.Helpers
 {
     internal static class Helper
     {
@@ -12,6 +6,13 @@ namespace GitHubApiCall.Helpers
         {
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("\n" + message);
+            Console.ResetColor();
+        }
+
+        internal static void PrintCommandMessage(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("\n" + message + "\n");
             Console.ResetColor();
         }
     }
