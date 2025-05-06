@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GitHubApiCall.Helpers;
+using Newtonsoft.Json;
 
 namespace GitHubApiCall
 {
@@ -6,14 +7,19 @@ namespace GitHubApiCall
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("GitHub User Activity CLI !");
+            WelcomeMessage();
 
             RunAsync().Wait();
+
+            while (true)
+            {
+
+            }
         }
 
         private static async Task RunAsync()
         {
-            string username = string.Empty;
+            string? username = string.Empty;
 
             while(string.IsNullOrEmpty(username))
             {
@@ -47,6 +53,9 @@ namespace GitHubApiCall
 
                 var events = JsonConvert.DeserializeObject<List<GitHubEvent>>(responseBody);
 
+                if (events == null || events.Count == 0)
+                    Console.WriteLine("No events or username not found.");
+
                 foreach (var element in events)
                 {
                     Console.WriteLine(element.Type);
@@ -57,6 +66,12 @@ namespace GitHubApiCall
             {
                 Console.WriteLine($"Request error: {e.Message}");
             }
+        }
+
+        static void WelcomeMessage()
+        {
+            Helper.PrintInfoMessage("Hello, Welcome to GitHub User Activity!");
+            Helper.PrintInfoMessage("Type \"help\" to know the set of API calls.");
         }
     }
 
