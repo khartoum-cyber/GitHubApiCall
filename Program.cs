@@ -24,6 +24,21 @@ namespace GitHubApiCall
                 }
 
                 var exit = false;
+
+                switch(input)
+                {
+                    case "get-events":
+                        RunAsync().Wait();
+                        break;
+                    case "exit":
+                        exit = true;
+                        break;
+                }
+
+                if (exit)
+                {
+                    break;
+                }
             }
         }
 
