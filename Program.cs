@@ -1,5 +1,4 @@
-﻿using System.Data;
-using GitHubApiCall.Helpers;
+﻿using GitHubApiCall.Helpers;
 using Newtonsoft.Json;
 
 namespace GitHubApiCall
@@ -8,9 +7,7 @@ namespace GitHubApiCall
     {
         static void Main(string[] args)
         {
-            WelcomeMessage();
-
-            //RunAsync().Wait();
+            Helper.WelcomeMessage();
 
             while (true)
             {
@@ -20,7 +17,7 @@ namespace GitHubApiCall
 
                 if (string.IsNullOrEmpty(input))
                 {
-                    Helper.PrintInfoMessage("No input detected, try again !");
+                    Helper.PrintWarningMessage("No input detected, try again !");
                 }
 
                 var exit = false;
@@ -28,7 +25,7 @@ namespace GitHubApiCall
                 switch(input)
                 {
                     case "get-events":
-                        RunAsync().Wait();
+                        GetUserEventsAsync().Wait();
                         break;
                     case "exit":
                         exit = true;
@@ -42,11 +39,11 @@ namespace GitHubApiCall
             }
         }
 
-        private static async Task RunAsync()
+        static async Task GetUserEventsAsync()
         {
             string? username = string.Empty;
 
-            while(string.IsNullOrEmpty(username))
+            while (string.IsNullOrEmpty(username))
             {
                 Console.WriteLine("Enter GitHub username: ");
 
@@ -60,17 +57,12 @@ namespace GitHubApiCall
 
             var url = $"https://api.github.com/users/{username}/events";
 
-            await GetUserActivityAsync(url);
-        }
-
-        static async Task GetUserActivityAsync(string path)
-        {
             using HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
 
             try
             {
-                HttpResponseMessage response = await client.GetAsync(path);
+                HttpResponseMessage response = await client.GetAsync(url);
 
                 response.EnsureSuccessStatusCode();
 
@@ -91,12 +83,6 @@ namespace GitHubApiCall
             {
                 Console.WriteLine($"Request error: {e.Message}");
             }
-        }
-
-        static void WelcomeMessage()
-        {
-            Helper.PrintInfoMessage("Hello, Welcome to GitHub User Activity!");
-            Helper.PrintInfoMessage("Type \"help\" to know the set of API commands.");
         }
     }
 
