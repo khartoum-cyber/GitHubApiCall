@@ -1,4 +1,5 @@
 ﻿using GitHubApiCall.Helpers;
+using GitHubApiCall.Models;
 using Newtonsoft.Json;
 
 namespace GitHubApiCall
@@ -24,6 +25,9 @@ namespace GitHubApiCall
 
                 switch(input)
                 {
+                    case "help":
+                        HelpMessage();
+                        break;
                     case "get-events":
                         GetUserEventsAsync().Wait();
                         break;
@@ -84,10 +88,22 @@ namespace GitHubApiCall
                 Console.WriteLine($"Request error: {e.Message}");
             }
         }
-    }
 
-    public class GitHubEvent
-    {
-        public string Type { get; set; }
+        static void HelpMessage()
+        {
+            var count = 1;
+            var list = new List<string>
+            {
+                "get-events - \"To\" list events for given user.",
+                "exit - To close the app",
+                "clear - To clear console window"
+            };
+
+            foreach (var element in list)
+            {
+                Console.WriteLine($"{count} : {element}");
+                count++;
+            }
+        }
     }
 }
