@@ -86,9 +86,25 @@ namespace GitHubApiCall
 
                 foreach (var element in events)
                 {
-                    string type = element.Type("type").ToString();
+                    switch (element.Type)
+                    {
 
-                    Console.WriteLine(element.Type);
+                        case "PushEvent":
+                            int commitCount = element.Payload?.Commits?.Count ?? 0;
+                            Console.WriteLine($"Pushed {commitCount} commit(s) to {element.Repo.Name}");
+                            break;
+
+                        case "IssuesEvent":
+                            if (element.Payload?.Action == "opened")
+                                Console.WriteLine($"Opened a new issue in {element.Repo.Name}");
+                            break;
+
+                        case "WatchEvent":
+                            if (element.Payload?.Action == "started")
+                                Console.WriteLine($"Starred {element.Repo.Name}");
+                            break;
+                    }
+
                 }
             }
 
