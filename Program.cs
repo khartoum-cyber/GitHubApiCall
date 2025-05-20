@@ -86,6 +86,8 @@ namespace GitHubApiCall
 
                 foreach (var element in events)
                 {
+                    string type = element.Type("type").ToString();
+
                     Console.WriteLine(element.Type);
                 }
             }

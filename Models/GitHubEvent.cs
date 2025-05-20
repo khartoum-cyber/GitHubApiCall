@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GitHubApiCall.Models
+﻿namespace GitHubApiCall.Models
 {
     public class GitHubEvent
     {
         public string Type { get; set; }
+        public Repo Repo { get; set; }
+        public Payload Payload { get; set; }
+
     }
 }
