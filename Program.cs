@@ -49,13 +49,20 @@ namespace GitHubApiCall
 
             while (string.IsNullOrEmpty(username))
             {
-                Console.WriteLine("Enter GitHub username: ");
+                Console.WriteLine("Enter GitHub username:");
 
                 username = Console.ReadLine();
 
                 if (string.IsNullOrEmpty(username))
                 {
-                    Console.WriteLine("Username cannot be empty. Please try again.");
+                    Console.WriteLine("Username cannot be empty. Please try again or press Esc to exit.");
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+
+                    if (keyInfo.Key == ConsoleKey.Escape)
+                    {
+                        Console.WriteLine("ESC key pressed. Exiting...");
+                        return;
+                    }
                 }
             }
 
@@ -94,7 +101,7 @@ namespace GitHubApiCall
             var count = 1;
             var list = new List<string>
             {
-                "get-events - \"To\" list events for given user.",
+                "get-events - To list events for given user.",
                 "exit - To close the app",
                 "clear - To clear console window"
             };
