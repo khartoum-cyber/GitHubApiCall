@@ -46,21 +46,29 @@ namespace GitHubApiCall
         static async Task GetUserEventsAsync()
         {
             string? username = string.Empty;
+            int retryCount = 0;
+            const int maxRetries = 5;
 
-            while (string.IsNullOrEmpty(username))
+            while (string.IsNullOrWhiteSpace(username))
             {
-                Console.WriteLine("Enter GitHub username:");
-
-                username = Console.ReadLine();
+                Console.WriteLine("\nEnter GitHub username:");
+                username = Console.ReadLine()?.Trim();
 
                 if (string.IsNullOrEmpty(username))
                 {
+                    retryCount++;
                     Console.WriteLine("Username cannot be empty. Please try again or press Esc to exit.");
-                    ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
 
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
                     if (keyInfo.Key == ConsoleKey.Escape)
                     {
-                        Console.WriteLine("ESC key pressed. Exiting...");
+                        Console.WriteLine("\nESC key pressed. Exiting...");
+                        return;
+                    }
+
+                    if (retryCount >= maxRetries)
+                    {
+                        Console.WriteLine("Too many failed attempts. Exiting...");
                         return;
                     }
                 }
@@ -91,17 +99,17 @@ namespace GitHubApiCall
 
                         case "PushEvent":
                             int commitCount = element.Payload?.Commits?.Count ?? 0;
-                            Console.WriteLine($"Pushed {commitCount} commit(s) to {element.Repo.Name}");
+                            Console.WriteLine($"- Pushed {commitCount} commit(s) to {element.Repo.Name}");
                             break;
 
                         case "IssuesEvent":
                             if (element.Payload?.Action == "opened")
-                                Console.WriteLine($"Opened a new issue in {element.Repo.Name}");
+                                Console.WriteLine($"- Opened a new issue in {element.Repo.Name}");
                             break;
 
                         case "WatchEvent":
                             if (element.Payload?.Action == "started")
-                                Console.WriteLine($"Starred {element.Repo.Name}");
+                                Console.WriteLine($"- Starred {element.Repo.Name}");
                             break;
                     }
 
