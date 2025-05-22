@@ -29,7 +29,7 @@ namespace GitHubApiCall
                         HelpMessage();
                         break;
                     case "get-events":
-                        GetUserEventsAsync().Wait();
+                        PrintUserEvents().Wait();
                         break;
                     case "exit":
                         exit = true;
@@ -43,7 +43,7 @@ namespace GitHubApiCall
             }
         }
 
-        static async Task GetUserEventsAsync()
+        static async Task PrintUserEvents()
         {
             string? username = string.Empty;
             int retryCount = 0;
@@ -74,6 +74,39 @@ namespace GitHubApiCall
                 }
             }
 
+            var events = await GetUserEventsAsync(username);
+
+            if (events == null)
+            {
+                Console.WriteLine("No events retrieved.");
+                return;
+            }
+
+            foreach (var element in events)
+            {
+                switch (element.Type)
+                {
+
+                    case "PushEvent":
+                        int commitCount = element.Payload?.Commits?.Count ?? 0;
+                        Console.WriteLine($"- Pushed {commitCount} commit(s) to {element.Repo.Name}");
+                        break;
+
+                    case "IssuesEvent":
+                        if (element.Payload?.Action == "opened")
+                            Console.WriteLine($"- Opened a new issue in {element.Repo.Name}");
+                        break;
+
+                    case "WatchEvent":
+                        if (element.Payload?.Action == "started")
+                            Console.WriteLine($"- Starred {element.Repo.Name}");
+                        break;
+                }
+            }
+        }
+
+        static async Task<List<GitHubEvent>?> GetUserEventsAsync(string username)
+        {
             var url = $"https://api.github.com/users/{username}/events";
 
             using HttpClient client = new HttpClient();
@@ -89,36 +122,13 @@ namespace GitHubApiCall
 
                 var events = JsonConvert.DeserializeObject<List<GitHubEvent>>(responseBody);
 
-                if (events == null || events.Count == 0)
-                    Console.WriteLine("No events or username not found.");
-
-                foreach (var element in events)
-                {
-                    switch (element.Type)
-                    {
-
-                        case "PushEvent":
-                            int commitCount = element.Payload?.Commits?.Count ?? 0;
-                            Console.WriteLine($"- Pushed {commitCount} commit(s) to {element.Repo.Name}");
-                            break;
-
-                        case "IssuesEvent":
-                            if (element.Payload?.Action == "opened")
-                                Console.WriteLine($"- Opened a new issue in {element.Repo.Name}");
-                            break;
-
-                        case "WatchEvent":
-                            if (element.Payload?.Action == "started")
-                                Console.WriteLine($"- Starred {element.Repo.Name}");
-                            break;
-                    }
-
-                }
+                return events;
             }
 
             catch (HttpRequestException e)
             {
                 Console.WriteLine($"Request error: {e.Message}");
+                return null;
             }
         }
 
