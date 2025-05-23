@@ -45,34 +45,9 @@ namespace GitHubApiCall
 
         static async Task PrintUserEvents()
         {
-            string? username = string.Empty;
-            int retryCount = 0;
-            const int maxRetries = 5;
-
-            while (string.IsNullOrWhiteSpace(username))
-            {
-                Console.WriteLine("\nEnter GitHub username:");
-                username = Console.ReadLine()?.Trim();
-
-                if (string.IsNullOrEmpty(username))
-                {
-                    retryCount++;
-                    Console.WriteLine("Username cannot be empty. Please try again or press Esc to exit.");
-
-                    ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
-                    if (keyInfo.Key == ConsoleKey.Escape)
-                    {
-                        Console.WriteLine("\nESC key pressed. Exiting...");
-                        return;
-                    }
-
-                    if (retryCount >= maxRetries)
-                    {
-                        Console.WriteLine("Too many failed attempts. Exiting...");
-                        return;
-                    }
-                }
-            }
+            var username = Helper.PromptForUsername();
+            if (username == null)
+                return;
 
             var events = await GetUserEventsAsync(username);
 
@@ -86,7 +61,6 @@ namespace GitHubApiCall
             {
                 switch (element.Type)
                 {
-
                     case "PushEvent":
                         int commitCount = element.Payload?.Commits?.Count ?? 0;
                         Console.WriteLine($"- Pushed {commitCount} commit(s) to {element.Repo.Name}");
