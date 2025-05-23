@@ -42,7 +42,7 @@
                     return username;
 
                 retryCount++;
-                Console.WriteLine("Username cannot be empty. Please try again or press Esc to exit.");
+                Console.WriteLine("Username cannot be empty. Please press Enter to try again or press Esc to exit.");
 
                 var keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Escape)
