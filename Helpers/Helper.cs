@@ -6,29 +6,44 @@ namespace GitHubApiCall.Helpers
     {
         internal static void PrintInfoMessage(string message)
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("\n" + message);
-            Console.ResetColor();
+            AnsiConsole.MarkupLine($"\n[blue]{EscapeMarkup(message)}[/]");
         }
 
         internal static void PrintCommandMessage(string message)
         {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\n" + message + "\n");
-            Console.ResetColor();
+            AnsiConsole.MarkupLine($"\n[bold white]{EscapeMarkup(message)}[/]\n");
         }
 
         internal static void PrintWarningMessage(string message)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\n" + message);
-            Console.ResetColor();
+            AnsiConsole.MarkupLine($"\n[red]{EscapeMarkup(message)}[/]");
+        }
+
+        // Optional: Escape markup characters like [ and ] to avoid formatting issues
+        private static string EscapeMarkup(string input)
+        {
+            return input.Replace("[", "[[").Replace("]", "]]");
         }
 
         internal static void WelcomeMessage()
         {
-            Helper.PrintInfoMessage("Hello, Welcome to GitHub User Activity!");
-            Helper.PrintInfoMessage("Type \"help\" to know the set of API commands.");
+            // Create a dynamic ASCII banner using FigletText
+            var banner = new FigletText("GitHubApiCall")
+                .Centered()
+                .Color(Color.Green);
+
+            AnsiConsole.Write(banner);
+
+            var panel = new Panel(
+                new Markup("[bold yellow]Hello, Welcome to GitHub User Activity![/]\n[green]Type [bold]\"help\"[/] to know the set of API commands.[/]").Centered()
+            )
+            {
+                Border = BoxBorder.Rounded,
+                Padding = new Padding(1, 1),
+                Header = new PanelHeader("[blue]Welcome[/]", Justify.Center)
+            };
+
+            AnsiConsole.Write(panel);
         }
 
         internal static string? PromptForUsername(int maxRetries = 5)
