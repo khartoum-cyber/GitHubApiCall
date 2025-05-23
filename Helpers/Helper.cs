@@ -1,4 +1,6 @@
-﻿namespace GitHubApiCall.Helpers
+﻿using Spectre.Console;
+
+namespace GitHubApiCall.Helpers
 {
     internal static class Helper
     {
@@ -35,24 +37,28 @@
 
             while (retryCount < maxRetries)
             {
-                Console.WriteLine("\nEnter GitHub username:");
-                var username = Console.ReadLine()?.Trim();
+                var username = AnsiConsole.Prompt(
+                    new TextPrompt<string>("[green]Enter GitHub username:[/]")
+                        .PromptStyle("cyan")
+                        .AllowEmpty());
 
-                if (!string.IsNullOrWhiteSpace(username)) 
-                    return username;
+
+                if (!string.IsNullOrWhiteSpace(username))
+                    return username.Trim();
 
                 retryCount++;
-                Console.WriteLine("Username cannot be empty. Please press Enter to try again or press Esc to exit.");
+                AnsiConsole.MarkupLine("[red]Username cannot be empty.[/] Press [yellow]Esc[/] to exit or try again.");
 
                 var keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Escape)
                 {
-                    Console.WriteLine("\nESC key pressed. Exiting...");
+                    AnsiConsole.MarkupLine("\n[red]ESC key pressed. Exiting...[/]");
                     return null;
+
                 }
             }
 
-            Console.WriteLine("Too many failed attempts. Exiting...");
+            AnsiConsole.MarkupLine("[red]Too many failed attempts. Exiting...[/]");
             return null;
         }
     }
