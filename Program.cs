@@ -1,6 +1,7 @@
 ﻿using GitHubApiCall.Helpers;
 using GitHubApiCall.Models;
 using Newtonsoft.Json;
+using Spectre.Console;
 
 namespace GitHubApiCall
 {
@@ -43,39 +44,36 @@ namespace GitHubApiCall
             }
         }
 
-        static async Task PrintUserEvents()
+        private static async Task PrintUserEvents()
         {
             var username = Helper.PromptForUsername();
             if (username == null)
                 return;
 
+            AnsiConsole.Write(new Rule($"[yellow]GitHub Events for [bold]{username}[/][/]").RuleStyle("grey"));
+
             var events = await GetUserEventsAsync(username);
 
-            if (events == null)
+            if (events == null || events.Count == 0)
             {
-                Console.WriteLine("No events retrieved.");
+                AnsiConsole.MarkupLine("[italic red]No events to display.[/]");
                 return;
             }
 
             foreach (var element in events)
             {
-                switch (element.Type)
+                var message = element.Type switch
                 {
-                    case "PushEvent":
-                        int commitCount = element.Payload?.Commits?.Count ?? 0;
-                        Console.WriteLine($"- Pushed {commitCount} commit(s) to {element.Repo.Name}");
-                        break;
-
-                    case "IssuesEvent":
-                        if (element.Payload?.Action == "opened")
-                            Console.WriteLine($"- Opened a new issue in {element.Repo.Name}");
-                        break;
-
-                    case "WatchEvent":
-                        if (element.Payload?.Action == "started")
-                            Console.WriteLine($"- Starred {element.Repo.Name}");
-                        break;
-                }
+                    "PushEvent" =>
+                        $"- Pushed [green]{element.Payload?.Commits?.Count ?? 0}[/] commit(s) to [blue]{element.Repo.Name}[/]",
+                    "IssuesEvent" when element.Payload?.Action == "opened" =>
+                        $"- Opened a new issue in [blue]{element.Repo.Name}[/]",
+                    "WatchEvent" when element.Payload?.Action == "started" => $"- Starred [blue]{element.Repo.Name}[/]",
+                    _ => string.Empty
+                };
+            
+                if (!string.IsNullOrEmpty(message))
+                    AnsiConsole.MarkupLine(message);
             }
         }
 
