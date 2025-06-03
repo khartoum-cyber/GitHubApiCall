@@ -69,6 +69,20 @@ namespace GitHubApiCall
             }
         }
 
+        private async Task PrintUserProfile()
+        {
+            var username = Helper.PromptForUsername();
+            if (username == null) return;
+
+            var rule = new Rule($"GitHub Profile for {username}")
+                .RuleStyle("green")
+                .Centered();
+
+            AnsiConsole.Write(rule);
+
+            var profile = await apiCallService.GetUserProfileAsync(username);
+        }
+
         static void HelpMessage()
         {
             var count = 1;
