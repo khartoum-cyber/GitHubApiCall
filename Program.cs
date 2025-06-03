@@ -1,5 +1,8 @@
 ﻿using GitHubApiCall.Helpers;
+using GitHubApiCall.Interfaces;
 using GitHubApiCall.Models;
+using GitHubApiCall.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Spectre.Console;
 
@@ -9,6 +12,9 @@ namespace GitHubApiCall
     {
         static void Main(string[] args)
         {
+            var serviceProvider = new ServiceCollection().AddSingleton<IApiCallService, ApiCallService>().BuildServiceProvider();
+            var apiCallService = serviceProvider.GetService<IApiCallService>();
+
             Helper.WelcomeMessage();
 
             while (true)
@@ -30,7 +36,7 @@ namespace GitHubApiCall
                         HelpMessage();
                         break;
                     case "get-events":
-                        PrintUserEvents().Wait();
+                        PrintUserEvents();
                         break;
                     case "exit":
                         exit = true;
@@ -42,65 +48,38 @@ namespace GitHubApiCall
                     break;
                 }
             }
-        }
 
-        private static async Task PrintUserEvents()
-        {
-            var username = Helper.PromptForUsername();
-            if (username == null)
-                return;
-
-            AnsiConsole.Write(new Rule($"[yellow]GitHub Events for [bold]{username}[/][/]").RuleStyle("grey"));
-
-            var events = await GetUserEventsAsync(username);
-
-            if (events == null || events.Count == 0)
+            void PrintUserEvents()
             {
-                AnsiConsole.MarkupLine("[italic red]No events to display.[/]");
-                return;
-            }
+                var username = Helper.PromptForUsername();
+                if (username == null)
+                    return;
 
-            foreach (var element in events)
-            {
-                var message = element.Type switch
+                AnsiConsole.Write(new Rule($"[yellow]GitHub Events for [bold]{username}[/][/]").RuleStyle("grey"));
+
+                var events =  apiCallService?.GetUserEventsAsync(username).Result;
+
+                if (events == null || events.Count == 0)
                 {
-                    "PushEvent" =>
-                        $"- Pushed [green]{element.Payload?.Commits?.Count ?? 0}[/] commit(s) to [blue]{element.Repo.Name}[/]",
-                    "IssuesEvent" when element.Payload?.Action == "opened" =>
-                        $"- Opened a new issue in [blue]{element.Repo.Name}[/]",
-                    "WatchEvent" when element.Payload?.Action == "started" => $"- Starred [blue]{element.Repo.Name}[/]",
-                    _ => string.Empty
-                };
+                    AnsiConsole.MarkupLine("[italic red]No events to display.[/]");
+                    return;
+                }
+
+                foreach (var element in events)
+                {
+                    var message = element.Type switch
+                    {
+                        "PushEvent" =>
+                            $"- Pushed [green]{element.Payload?.Commits?.Count ?? 0}[/] commit(s) to [blue]{element.Repo.Name}[/]",
+                        "IssuesEvent" when element.Payload?.Action == "opened" =>
+                            $"- Opened a new issue in [blue]{element.Repo.Name}[/]",
+                        "WatchEvent" when element.Payload?.Action == "started" => $"- Starred [blue]{element.Repo.Name}[/]",
+                        _ => string.Empty
+                    };
             
-                if (!string.IsNullOrEmpty(message))
-                    AnsiConsole.MarkupLine(message);
-            }
-        }
-
-        static async Task<List<GitHubEvent>?> GetUserEventsAsync(string username)
-        {
-            var url = $"https://api.github.com/users/{username}/events";
-
-            using HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
-
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync(url);
-
-                response.EnsureSuccessStatusCode();
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                var events = JsonConvert.DeserializeObject<List<GitHubEvent>>(responseBody);
-
-                return events;
-            }
-
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine($"Request error: {e.Message}");
-                return null;
+                    if (!string.IsNullOrEmpty(message))
+                        AnsiConsole.MarkupLine(message);
+                }
             }
         }
 
