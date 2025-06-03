@@ -27,7 +27,7 @@ namespace GitHubApiCall
                         HelpMessage();
                         break;
                     case "get-events":
-                        PrintUserEvents();
+                        PrintUserEvents().Wait();
                         break;
                     case "exit":
                         return;
@@ -35,14 +35,18 @@ namespace GitHubApiCall
             }
         }
 
-        private void PrintUserEvents()
+        private async Task PrintUserEvents()
         {
             var username = Helper.PromptForUsername();
             if (username == null) return;
 
-            AnsiConsole.Write(new Rule($"[yellow]GitHub Events for [bold]{username}[/bold][/yellow]").RuleStyle("grey"));
+            var rule = new Rule($"GitHub Events for {username}")
+                .RuleStyle("yellow")
+                .Centered();
 
-            var events = apiCallService.GetUserEventsAsync(username).Result;
+            AnsiConsole.Write(rule);
+
+            var events = await apiCallService.GetUserEventsAsync(username);
 
             if (events == null || events.Count == 0)
             {
