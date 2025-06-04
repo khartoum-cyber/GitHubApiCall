@@ -1,5 +1,6 @@
 ﻿using GitHubApiCall.Interfaces;
 using GitHubApiCall.Models;
+using GitHubApiCall.Models.GitHubProfile;
 using Newtonsoft.Json;
 
 namespace GitHubApiCall.Services
@@ -24,6 +25,33 @@ namespace GitHubApiCall.Services
                 var events = JsonConvert.DeserializeObject<List<GitHubEvent>>(responseBody);
 
                 return events;
+            }
+
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+                return null;
+            }
+        }
+
+        public async Task<GitHubProfile?> GetUserProfileAsync(string username)
+        {
+            var url = $"https://api.github.com/users/{username}";
+
+            using HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var profile = JsonConvert.DeserializeObject<GitHubProfile>(responseBody);
+
+                return profile;
             }
 
             catch (HttpRequestException e)

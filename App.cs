@@ -29,6 +29,9 @@ namespace GitHubApiCall
                     case "get-events":
                         PrintUserEvents().Wait();
                         break;
+                    case "get-profile":
+                        PrintUserProfile().Wait();
+                        break;
                     case "exit":
                         return;
                 }
@@ -81,6 +84,14 @@ namespace GitHubApiCall
             AnsiConsole.Write(rule);
 
             var profile = await apiCallService.GetUserProfileAsync(username);
+
+            if (profile == null)
+            {
+                AnsiConsole.MarkupLine("[italic red]No profile to display.[/]");
+                return;
+            }
+
+            Console.WriteLine($"User : {username} has a name : {profile.Name}, works in {profile.Location} at {profile.Company}. Follower - {profile.Followers}. Following - {profile.Following}");
         }
 
         static void HelpMessage()
@@ -89,6 +100,7 @@ namespace GitHubApiCall
             var list = new List<string>
             {
                 "get-events - To list events for given user.",
+                "get-profile - To list profile of a user.",
                 "exit - To close the app",
                 "clear - To clear console window"
             };
