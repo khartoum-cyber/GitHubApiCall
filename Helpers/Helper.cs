@@ -117,10 +117,13 @@ namespace GitHubApiCall.Helpers
             AnsiConsole.Write(table);
         }
 
-        internal static void DisplayEvents(List<GitHubEvent> events)
+        internal static void DisplayEvents(List<GitHubEvent> events, string? eventType = null)
         {
             foreach (var element in events)
             {
+                if (!string.IsNullOrEmpty(eventType) && !string.Equals(element.Type, eventType, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 var message = element.Type switch
                 {
                     "PushEvent" =>

@@ -46,6 +46,9 @@ namespace GitHubApiCall
             var username = Helper.PromptForUsername();
             if (username == null) return;
 
+            Console.WriteLine("Filter by event type - enter : PushEvent, IssuesEvent, WatchEvent or leave empty to list all events.");
+            var eventType = Console.ReadLine() ?? string.Empty;
+
             var rule = new Rule($"GitHub Events for {username}")
                 .RuleStyle("yellow")
                 .Centered();
@@ -60,7 +63,7 @@ namespace GitHubApiCall
                 return;
             }
 
-            Helper.DisplayEvents(events);
+            Helper.DisplayEvents(events, eventType);
         }
 
         private async Task PrintUserProfile()
