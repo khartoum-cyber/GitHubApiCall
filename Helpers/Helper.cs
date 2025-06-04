@@ -50,6 +50,24 @@ namespace GitHubApiCall.Helpers
             AnsiConsole.Write(panel);
         }
 
+        internal static void HelpMessage()
+        {
+            var count = 1;
+            var list = new List<string>
+            {
+                "get-events - To list events for given user.",
+                "get-profile - To list profile of a user.",
+                "exit - To close the app",
+                "clear - To clear console window"
+            };
+
+            foreach (var element in list)
+            {
+                Console.WriteLine($"{count} : {element}");
+                count++;
+            }
+        }
+
         internal static string? PromptForUsername(int maxRetries = 5)
         {
             var retryCount = 0;

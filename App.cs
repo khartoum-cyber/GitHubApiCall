@@ -24,13 +24,16 @@ namespace GitHubApiCall
                 switch (input)
                 {
                     case "help":
-                        HelpMessage();
+                        Helper.HelpMessage();
                         break;
                     case "get-events":
                         PrintUserEvents().Wait();
                         break;
                     case "get-profile":
                         PrintUserProfile().Wait();
+                        break;
+                    case "clear":
+                        ClearConsole();
                         break;
                     case "exit":
                         return;
@@ -82,22 +85,9 @@ namespace GitHubApiCall
             Helper.DisplayProfile(profile);
         }
 
-        static void HelpMessage()
+        private void ClearConsole()
         {
-            var count = 1;
-            var list = new List<string>
-            {
-                "get-events - To list events for given user.",
-                "get-profile - To list profile of a user.",
-                "exit - To close the app",
-                "clear - To clear console window"
-            };
-
-            foreach (var element in list)
-            {
-                Console.WriteLine($"{count} : {element}");
-                count++;
-            }
+            Console.Clear();
         }
     }
 }
