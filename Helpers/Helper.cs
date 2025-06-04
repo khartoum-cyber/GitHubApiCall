@@ -1,4 +1,6 @@
-﻿using Spectre.Console;
+﻿using GitHubApiCall.Models;
+using GitHubApiCall.Models.GitHubProfile;
+using Spectre.Console;
 
 namespace GitHubApiCall.Helpers
 {
@@ -35,7 +37,9 @@ namespace GitHubApiCall.Helpers
             AnsiConsole.Write(banner);
 
             var panel = new Panel(
-                new Markup("[bold yellow]Hello, Welcome to GitHub User Activity![/]\n[green]Type [bold]\"help\"[/] to know the set of API commands.[/]").Centered()
+                new Markup(
+                        "[bold yellow]Hello, Welcome to GitHub User Activity![/]\n[green]Type [bold]\"help\"[/] to know the set of API commands.[/]")
+                    .Centered()
             )
             {
                 Border = BoxBorder.Rounded,
@@ -75,6 +79,43 @@ namespace GitHubApiCall.Helpers
 
             AnsiConsole.MarkupLine("[red]Too many failed attempts. Exiting...[/]");
             return null;
+        }
+
+        internal static void DisplayProfile(GitHubProfile profile)
+        {
+            var table = new Table()
+                .Border(TableBorder.Rounded)
+                .Title("[bold yellow]GitHub Profile[/]");
+
+            table.AddColumn("[blue]Field[/]");
+            table.AddColumn("[green]Value[/]");
+
+            table.AddRow("Name", profile.Name ?? "N/A");
+            table.AddRow("Company", profile.Company ?? "N/A");
+            table.AddRow("Location", profile.Location ?? "N/A");
+            table.AddRow("Followers", profile.Followers.ToString());
+            table.AddRow("Following", profile.Following.ToString());
+
+            AnsiConsole.Write(table);
+        }
+
+        internal static void DisplayEvents(List<GitHubEvent> events)
+        {
+            foreach (var element in events)
+            {
+                var message = element.Type switch
+                {
+                    "PushEvent" =>
+                        $"- Pushed [green]{element.Payload?.Commits?.Count ?? 0}[/] commit(s) to [blue]{element.Repo.Name}[/]",
+                    "IssuesEvent" when element.Payload?.Action == "opened" =>
+                        $"- Opened a new issue in [blue]{element.Repo.Name}[/]",
+                    "WatchEvent" when element.Payload?.Action == "started" => $"- Starred [blue]{element.Repo.Name}[/]",
+                    _ => string.Empty
+                };
+
+                if (!string.IsNullOrEmpty(message))
+                    AnsiConsole.MarkupLine(message);
+            }
         }
     }
 }

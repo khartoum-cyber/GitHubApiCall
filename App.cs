@@ -57,19 +57,7 @@ namespace GitHubApiCall
                 return;
             }
 
-            foreach (var element in events)
-            {
-                var message = element.Type switch
-                {
-                    "PushEvent" => $"- Pushed [green]{element.Payload?.Commits?.Count ?? 0}[/] commit(s) to [blue]{element.Repo.Name}[/]",
-                    "IssuesEvent" when element.Payload?.Action == "opened" => $"- Opened a new issue in [blue]{element.Repo.Name}[/]",
-                    "WatchEvent" when element.Payload?.Action == "started" => $"- Starred [blue]{element.Repo.Name}[/]",
-                    _ => string.Empty
-                };
-
-                if (!string.IsNullOrEmpty(message))
-                    AnsiConsole.MarkupLine(message);
-            }
+            Helper.DisplayEvents(events);
         }
 
         private async Task PrintUserProfile()
@@ -91,7 +79,7 @@ namespace GitHubApiCall
                 return;
             }
 
-            Console.WriteLine($"User : {username} has a name : {profile.Name}, works in {profile.Location} at {profile.Company}. Follower - {profile.Followers}. Following - {profile.Following}");
+            Helper.DisplayProfile(profile);
         }
 
         static void HelpMessage()
