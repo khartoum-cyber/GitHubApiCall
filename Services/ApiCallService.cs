@@ -7,16 +7,21 @@ namespace GitHubApiCall.Services
 {
     internal class ApiCallService : IApiCallService
     {
+
+        private readonly HttpClient _httpClient;
+
+        public ApiCallService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
         public async Task<List<GitHubEvent>?> GetUserEventsAsync(string username)
         {
             var url = $"https://api.github.com/users/{username}/events";
 
-            using HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
-
             try
             {
-                HttpResponseMessage response = await client.GetAsync(url);
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
 
                 response.EnsureSuccessStatusCode();
 
@@ -38,12 +43,9 @@ namespace GitHubApiCall.Services
         {
             var url = $"https://api.github.com/users/{username}";
 
-            using HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
-
             try
             {
-                HttpResponseMessage response = await client.GetAsync(url);
+                HttpResponseMessage response = await _httpClient.GetAsync(url);
 
                 response.EnsureSuccessStatusCode();
 

@@ -8,10 +8,16 @@ namespace GitHubApiCall
     {
         static void Main(string[] args)
         {
-            var serviceProvider = new ServiceCollection()
-                .AddSingleton<IApiCallService, ApiCallService>()
-                .AddSingleton<App>()
-                .BuildServiceProvider();
+            var services = new ServiceCollection();
+
+            services.AddHttpClient<IApiCallService, ApiCallService>(client =>
+                {
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("request");
+                });
+                
+            services.AddSingleton<App>();
+                
+            var serviceProvider = services.BuildServiceProvider();
 
             var app = serviceProvider.GetRequiredService<App>();
             app.Run();
