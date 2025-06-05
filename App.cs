@@ -46,7 +46,8 @@ namespace GitHubApiCall
             var username = Helper.PromptForUsername();
             if (username == null) return;
 
-            Console.WriteLine("Filter by event type - enter : PushEvent, IssuesEvent, WatchEvent or leave empty to list all events.");
+            AnsiConsole.MarkupLine("[bold yellow]Filter by event type[/] - enter: [green]PushEvent[/], [green]IssuesEvent[/], [green]WatchEvent[/] or leave empty to list [blue]all events[/].");
+
             var eventType = Console.ReadLine() ?? string.Empty;
 
             var rule = new Rule($"GitHub Events for {username}")
